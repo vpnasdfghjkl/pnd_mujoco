@@ -2,7 +2,7 @@ import time
 import sys
 import numpy as np
 
-from pndbotics_sdk_py.core.channel import ChannelPublisher, ChannelFactoryInitialize
+from pndbotics_sdk_py.core.channel import ChannelPublisher, ChannelSubscriber, ChannelFactoryInitialize
 from pndbotics_sdk_py.idl.default import adam_u_msg_dds__LowCmd_
 from pndbotics_sdk_py.idl.default import adam_u_msg_dds__LowState_
 from pndbotics_sdk_py.idl.adam_u.msg.dds_ import LowCmd_
@@ -56,7 +56,7 @@ KD_CONFIG = [
 ]
 
 
-open_arm_pos = np.array([0, 0, 0,
+open_arm_pos = np.array([0, -1.5, 0,
                        0.7, -0.5,
         -1.6, 2.06, -1.65, -1.77,
                       0.32, 0, 0,
@@ -98,6 +98,12 @@ if __name__ == '__main__':
     hand_pub.Init()
     hand_cmd = adam_u_msg_dds__HandCmd_()
 
+    def hand_lowstate(msg: LowState_):
+        print(msg.motor_state,)
+
+    sub = ChannelSubscriber("rt/lowstate", LowState_)
+    sub.Init(handler = hand_lowstate, queueLen=10)
+
     while True:
         step_start = time.perf_counter()
 
@@ -116,9 +122,10 @@ if __name__ == '__main__':
                 cmd.motor_cmd[i].dq = 0.0
                 cmd.motor_cmd[i].kd = KD_CONFIG[i]
                 cmd.motor_cmd[i].tau = 0.0
-
+            print(cmd.motor_cmd[6])
             for i in range(12):
-                hand_cmd.position[i] = close_hand[i]
+                hand_cmd.position[i] = int(phase * close_hand[i] + (
+                    1 - phase) * open_hand[i])
         else:
             # Then stand down
             phase = np.tanh((runing_time - 3.0) / 1.2)
@@ -132,9 +139,10 @@ if __name__ == '__main__':
                 cmd.motor_cmd[i].tau = 0.0
 
             for i in range(12):
-                hand_cmd.position[i] = open_hand[i]
+                hand_cmd.position[i] = int(phase * open_hand[i] + (
+                    1 - phase) * close_hand[i])
 
-        #print(cmd.motor_cmd[6].q)
+        # print(cmd.motor_cmd[6].q)
         pub.Write(cmd)
         hand_pub.Write(hand_cmd)
 

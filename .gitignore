@@ -22,3 +22,9 @@ dist/
 *.swp
 *.swo
 *~
+
+
+# ros2 工作空间
+build/
+install/
+log/

@@ -6,7 +6,7 @@ import threading
 
 from pndbotics_sdk_py.core.channel import ChannelFactoryInitialize
 from pndbotics_sdk_py_bridge import pndSdkBridge, ElasticBand
-from pndbotics_ros_bridge import pndRos2Bridge
+from real_ros_bridge import RealRosBridge
 
 import config
 
@@ -45,7 +45,7 @@ def SimulationThread():
     if config.SDK_TYPE == "ROS2":
         # pnd = pndSdkBridge(mj_model, mj_data)
         ChannelFactoryInitialize(config.DOMAIN_ID)
-        pnd = pndRos2Bridge(mj_model, mj_data)
+        pnd = RealRosBridge(mj_model, mj_data)
     elif config.SDK_TYPE == "DDS":
         # use python sdk example 
         # ChannelFactoryInitialize(config.DOMAIN_ID)
@@ -72,6 +72,12 @@ def SimulationThread():
                     mj_data.qpos[:3], mj_data.qvel[:3]
                 )
         mujoco.mj_step(mj_model, mj_data)
+
+        # For ROS2 mode, consume newest commands and publish newest state
+        # while holding the same MuJoCo lock for consistency.
+        if config.SDK_TYPE == "ROS2":
+            pnd.ApplyLatestCommands(assume_sim_locked=True)
+            pnd.PublishLowState(assume_sim_locked=True)
 
         locker.release()
 
