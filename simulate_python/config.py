@@ -1,5 +1,12 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+
 ROBOT = "adam_u" # Robot name, "adam_u", "adam_lite", "adam_sp" 
-ROBOT_SCENE = "../pnd_robots/" + ROBOT + "/scene.xml" # Robot scene
+ROBOT_SCENE = str(_REPO_ROOT / "pnd_robots" / ROBOT / "scene.xml")  # Robot scene
 HANDPOSE_SRC = 1 # 0 is sim2sim 1 is real2sim
 # For ROS2
 SDK_TYPE="ROS2" # "ROS2" or "DDS"

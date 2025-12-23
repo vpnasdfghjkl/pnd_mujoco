@@ -56,9 +56,10 @@ def SimulationThread():
 
     # print(pnd.low_cmd_suber)
 
-    if config.USE_JOYSTICK:
+    # Optional helpers exist only on some bridge implementations.
+    if config.USE_JOYSTICK and hasattr(pnd, "SetupJoystick"):
         pnd.SetupJoystick(device_id=0, js_type=config.JOYSTICK_TYPE)
-    if config.PRINT_SCENE_INFORMATION:
+    if config.PRINT_SCENE_INFORMATION and hasattr(pnd, "PrintSceneInformation"):
         pnd.PrintSceneInformation()
 
     while viewer.is_running():

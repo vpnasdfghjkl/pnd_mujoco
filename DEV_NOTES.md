@@ -93,6 +93,12 @@
 - `example/ros2/install/setup.*`
 
 2) 启动仿真：
+
+推荐（不依赖当前工作目录，最稳）：
+- `cd /home/hanxiao/camille/code/pnd_mujoco`
+- `python3 -m simulate_python.pnd_mujoco`
+
+兼容（在 simulate_python 目录内运行）：
 - `cd /home/hanxiao/camille/code/pnd_mujoco/simulate_python`
 - `python3 pnd_mujoco.py`
 
