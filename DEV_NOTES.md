@@ -130,6 +130,20 @@ VR 端只需发布 `sensor_msgs/JointState` 到 `/joint_states`。
 - `ROS_DOMAIN_ID` 不一致
 - ROS2 daemon 状态异常（可尝试 `ros2 daemon stop && ros2 daemon start`）
 
+## rt/* 转发为 ROS2（数据采集）
+
+用于把 vendor 通道 `rt/lowcmd`、`rt/lowstate` 转发成 ROS2 话题（同名），方便 `ros2 bag record`。
+
+- 脚本：
+  - [simulate_python/rt_to_ros2_bridge.py](simulate_python/rt_to_ros2_bridge.py)
+
+- 运行（示例）：
+  - `. /opt/ros/humble/setup.zsh`
+  - `. /home/hanxiao/camille/code/pnd_mujoco/example/ros2/install/setup.zsh`
+  - `python3 -m simulate_python.rt_to_ros2_bridge --domain-id 1 --iface lo`
+
+转发后的 ROS2 topic 默认是 `rt/lowcmd`、`rt/lowstate`，可用 `--ros2-lowcmd/--ros2-lowstate` 改名。
+
 ## 可复用转换模块的用法（给 VR 发送端）
 
 把 [example/ros2/src/vr_jointstate_utils.py](example/ros2/src/vr_jointstate_utils.py) 复制到 VR 工程后：
